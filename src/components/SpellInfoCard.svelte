@@ -1,6 +1,13 @@
 <script lang="ts">
 	import type { spellInfo } from '../lib/spellInterface';
+	import { createEventDispatcher } from 'svelte';
 	export let spellInfo: spellInfo;
+
+	const dispatch = createEventDispatcher();
+	//function that will close the spellcard when the 'X' button is pressed
+	const closeCard = () => {
+		dispatch('closeSpellInfoCard');
+	};
 </script>
 
 <div>
@@ -9,7 +16,7 @@
 			<div class="flex flex-row items-center justify-center">
 				<div class="flex text-center">{spellInfo.name}</div>
 				<div class="flex ml-auto">
-					<button type="button" class="btn btn-sm redButton"> X </button>
+					<button type="button" class="btn btn-sm redButton" on:click={closeCard}> X </button>
 				</div>
 			</div>
 		</header>
