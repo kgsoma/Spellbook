@@ -1,8 +1,9 @@
 <script lang="ts">
+	import spellData from '../local_static_files/spellData.json';
 	import SpellCard from '../components/SpellCard.svelte';
 	import type { spellInfo } from '../lib/spellInterface';
 	import SpellInfoCard from '../components/SpellInfoCard.svelte';
-	import { Autocomplete } from '@skeletonlabs/skeleton';
+	import { Autocomplete, dataTableHandler } from '@skeletonlabs/skeleton';
 	import type { AutocompleteOption } from '@skeletonlabs/skeleton';
 
 	interface apiResponse {
@@ -18,6 +19,37 @@
 	let searchInput = '';
 	let spellsArray: spellInfo[] = [];
 	let autoCompleteArray: AutocompleteOption[] = [];
+
+	for (let spell of spellData.results) {
+		spellsArray.push({
+			name: spell.name,
+			casting_time: spell.casting_time,
+			components: spell.components,
+			concentration: spell.concentration,
+			desc: spell.desc,
+			dnd_class: spell.dnd_class,
+			duration: spell.duration,
+			higher_level: spell.higher_level,
+			level: spell.level,
+			level_int: spell.level_int,
+			material: spell.material,
+			range: spell.range,
+			requires_concentration: spell.requires_concentration,
+			requires_material_components: spell.requires_material_components,
+			requires_somatic_components: spell.requires_somatic_components,
+			requires_verbal_components: spell.requires_verbal_components,
+			ritual: spell.ritual,
+			school: spell.school,
+			spell_level: spell.spell_level,
+			target_range_sort: spell.target_range_sort
+		});
+	}
+	generateAutoCompleteSpells();
+
+	//function that will close spell card when 'X' button is pressed
+	function closeSpellCard(event: any) {
+		selectedCard = undefined;
+	}
 
 	function onSpellSelection(event: any): void {
 		selectedCard = spellsArray.find((spell) => {
@@ -42,19 +74,6 @@
 		spellsLoaded = true;
 		autoCompleteArray = autoCompleteArray;
 	}
-
-	const getSpells = async (url: string) => {
-		const response = await fetch(url);
-		const data: apiResponse = await response.json();
-		spellsArray.push(...data.results);
-		if (data.next) {
-			getSpells(data.next);
-		} else {
-			generateAutoCompleteSpells();
-		}
-	};
-	getSpells('https://api.open5e.com/spells/');
-	console.log(autoCompleteArray);
 
 	function clickOutsideSearchBar(event: any) {
 		console.log(event.target.id);
@@ -91,9 +110,11 @@
 		</div>
 	</div>
 </div>
-{#if selectedCard}
-	<SpellInfoCard spellInfo={selectedCard} />
-{/if}
+<div>
+	{#if selectedCard}
+		<SpellInfoCard spellInfo={selectedCard} on:closeSpellInfoCard={closeSpellCard} />
+	{/if}
+</div>
 <div>
 	<h3 class="text-left p-4 py-2">Cantrips</h3>
 	<SpellCard name="Fire Bolt" />
